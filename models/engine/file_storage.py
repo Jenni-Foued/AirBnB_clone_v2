@@ -30,7 +30,15 @@ class FileStorage:
             temp.update(FileStorage.__objects)
             for key, val in temp.items():
                 temp[key] = val.to_dict()
-            json.dump(temp, f)
+            json.dump(temp, f, sort_keys=True, indent=4)
+
+    def delete(self, obj=None):
+        """Deletes the object obj if obj is in __objects"""
+        if obj is not None:
+            for k, v in FileStorage.__objects.items():
+                if v is obj:
+                    tmp = k
+            FileStorage.__objects.pop(tmp)
 
     def reload(self):
         """Loads storage dictionary from file"""
@@ -43,24 +51,19 @@ class FileStorage:
         from models.review import Review
 
         classes = {
-                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-                    'State': State, 'City': City, 'Amenity': Amenity,
-                    'Review': Review
-                  }
+            'BaseModel': BaseModel, 'User': User, 'Place': Place,
+            'State': State, 'City': City, 'Amenity': Amenity,
+            'Review': Review
+        }
         try:
             temp = {}
             with open(FileStorage.__file_path, 'r') as f:
                 temp = json.load(f)
                 for key, val in temp.items():
-                        self.all()[key] = classes[val['__class__']](**val)
+                    self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
 
-    def delete(self, obj=None):
-        """delete obj from __objects if obj in __objects"""
-        if obj is not None:
-            for k, v in FileStorage.__objects.items():
-                if v is obj:
-                    tmp = k
-                    break
-            FileStorage.__objects.pop(tmp)
+    def close(self):
+        """Handles storage close"""
+        self.reload()
