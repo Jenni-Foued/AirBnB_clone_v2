@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # Sets up the web servers for the deployment of web_static
 
 sudo apt update && sudo apt upgrade -y
